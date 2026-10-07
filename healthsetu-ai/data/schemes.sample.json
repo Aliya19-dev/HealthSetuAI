@@ -1,0 +1,26 @@
+[
+  {
+    "id": "pmjay",
+    "name": "Ayushman Bharat PM-JAY",
+    "when": "hosp",
+    "url": "https://pmjay.gov.in",
+    "text": "STARTER TEXT, NOT VERIFIED. Replace with wording and eligibility from the official source. Cashless hospitalisation cover at empanelled hospitals under Health Benefit Packages.",
+    "procs": "surgery operation appendectomy hernia fracture orthopaedic cardiac angioplasty cataract dialysis cancer caesarean icu admission hospitalisation"
+  },
+  {
+    "id": "ddssy",
+    "name": "Goa DDSSY (Deen Dayal Swasthya Seva Yojana)",
+    "when": "hosp",
+    "url": null,
+    "text": "STARTER TEXT, NOT VERIFIED. Replace with the current approved procedure list and eligibility from the Goa Directorate of Health Services.",
+    "procs": "surgery operation hospitalisation fracture cardiac cataract delivery admission"
+  },
+  {
+    "id": "esan",
+    "name": "eSanjeevani tele-consultation",
+    "when": "tele",
+    "url": "https://esanjeevani.mohfw.gov.in",
+    "text": "STARTER TEXT, NOT VERIFIED. Government video consultation for non-emergency problems. Check the portal for OPD timings.",
+    "procs": "fever cough rash vomiting diarrhoea mild follow-up consultation"
+  }
+]

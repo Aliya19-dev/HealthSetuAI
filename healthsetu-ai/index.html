@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HealthSetu AI (local-first)</title>
+<style>
+:root{--ind:#1A237E;--amb:#E65100;--bg:#E9EBF5;--card:#F8F9FA;--ink:#1c1b29;--mut:#5b5a6e;--line:#d9d6cc;--g:#1B7F3B;--y:#B7791F;--o:#D84315;--r:#C62828}
+@media (prefers-color-scheme:dark){:root{--bg:#10122b;--card:#1b1e44;--ink:#eeeaf7;--mut:#a9a8c4;--line:#3b3f78;--ind:#9FA8FF}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Devanagari","Segoe UI",system-ui,sans-serif;line-height:1.45;padding:env(safe-area-inset-top,0) 0 calc(112px + env(safe-area-inset-bottom,0))}
+.app{max-width:460px;margin:0 auto;padding:12px 14px}
+h1{font-size:1.4rem;margin:0;color:var(--ind)}h2{font-size:1.05rem;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sos{background:var(--r);color:#fff;border-radius:999px;padding:9px 16px;font-weight:700;text-decoration:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:11px}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+.c,.row button,select{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 10px;font:inherit;font-size:.9rem;cursor:pointer}
+[aria-pressed=true]{border-color:var(--amb)!important;background:rgba(230,81,0,.14)!important}
+.go,.sec{width:100%;border:0;border-radius:12px;padding:13px;font:inherit;font-weight:700;cursor:pointer}
+.go{background:var(--ind);color:#fff}.sec{background:transparent;border:1.5px solid var(--ind);color:var(--ind);margin-bottom:11px}
+:root:not(.x) .go{color:#fff}
+@media (prefers-color-scheme:dark){.go{color:#10122b}}
+textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius:10px;padding:9px;font:inherit;background:var(--bg);color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:6px}.tabs button{flex:1}
+svg.body{width:100%;max-height:430px;display:block;margin:0 auto}
+.sil{fill:none;stroke:var(--line);stroke-width:13;stroke-linecap:round;stroke-linejoin:round}
+.reg{fill:rgba(26,35,126,.16);stroke:var(--ind);stroke-width:1;cursor:pointer}
+.reg.sel{fill:rgba(230,81,0,.6);stroke:var(--amb)}.reg.act{stroke-width:3}
+.reg:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+.tok{border-radius:14px;padding:15px;color:#fff;margin-bottom:11px}.tok b{display:block;font-size:1.25rem}
+.red{background:var(--r)}.orange{background:var(--o)}.yellow{background:var(--y)}.green{background:var(--g)}
+.note{font-size:.8rem;color:var(--mut)}.hide{display:none!important}
+.it{padding:9px 0;border-bottom:1px solid var(--line)}.it:last-child{border:0}
+.tag{font-size:.72rem;background:rgba(26,35,126,.12);color:var(--ind);border-radius:6px;padding:1px 6px;margin-left:4px}
+a.lnk{color:var(--ind)}
+.foot{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:3px solid var(--r);z-index:5;padding-bottom:env(safe-area-inset-bottom,0)}
+.disc{font-size:.74rem;padding:5px 14px 3px;text-align:center}
+.nav{display:flex;border-top:1px solid var(--line)}.nav button{flex:1;border:0;background:none;color:var(--ind);padding:11px 4px;font:inherit;font-weight:600;border-bottom:3px solid transparent}
+.nav button[aria-pressed=true]{border-bottom-color:var(--amb)!important;background:none!important}
+.gauge{height:8px;background:rgba(255,255,255,.35);border-radius:6px;margin:8px 0}.gauge i{display:block;height:100%;background:#fff;border-radius:6px}
+details{border-bottom:1px solid var(--line);padding:6px 0}summary{font-weight:600;cursor:pointer}details p{margin:6px 0;font-size:.82rem}
+dialog{border:0;border-radius:14px;max-width:460px;width:94%;background:var(--card);color:var(--ink);padding:14px}
+table{width:100%;border-collapse:collapse;font-size:.78rem}td,th{border-bottom:1px solid var(--line);padding:5px;text-align:left;vertical-align:top}
+progress{width:100%}
+.top{position:sticky;top:0;z-index:4;background:var(--bg);padding:6px 0 8px;margin-bottom:6px}
+input[type=text],input[type=password],input[type=tel],input[type=number]{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:var(--bg);color:var(--ink);margin:4px 0}
+select{width:100%;margin:4px 0;padding:10px}
+.lv{display:inline-block;border-radius:6px;color:#fff;padding:0 7px;font-size:.75rem;font-weight:700;margin-left:4px}
+.x{color:var(--r);background:none;border:0;cursor:pointer;font:inherit;font-size:.85rem;text-decoration:underline}
+.nav button{font-size:.8rem;padding:11px 2px}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="top"><div><h1>HealthSetu AI</h1><div class="note">Goa health triage &amp; benefit navigator</div></div><a class="sos" href="tel:108" aria-label="Call 108 emergency">Call 108</a></div>
+
+ <div id="A">
+  <div class="card">
+   <div class="row" id="langs" role="group" aria-label="Voice language">
+    <button data-l="en-IN" aria-pressed="true">English</button><button data-l="hi-IN" aria-pressed="false">हिन्दी</button>
+    <button data-l="mr-IN" aria-pressed="false">मराठी</button><button data-l="kok" aria-pressed="false">कोंकणी</button></div>
+   <p class="note" id="lnote"></p>
+   <div class="row" style="align-items:stretch;flex-wrap:nowrap"><textarea id="txt" placeholder="Describe how you feel" aria-label="Symptoms"></textarea>
+   <button id="mic" aria-label="Speak symptoms" style="font-size:1.6rem;flex:none">🎙</button></div>
+  </div>
+
+  <div class="card"><h2>Where does it hurt?</h2>
+   <div class="tabs" id="view"><button data-v="f" aria-pressed="true">Front</button><button data-v="b" aria-pressed="false">Back</button></div>
+   <svg class="body" id="svg" viewBox="0 0 200 385" role="group" aria-label="Body map"></svg>
+   <div id="sub" class="hide">
+    <h2 id="subt"></h2>
+    <div class="note">Depth</div><div class="row" id="depth"></div>
+    <div class="note" style="margin-top:6px">Feels like</div><div class="row" id="ptype"></div>
+    <label class="note" style="display:block;margin-top:8px">Severity: <b id="sevv">5</b>/10 <span id="sevl"></span>
+     <input id="sev" type="range" min="0" max="10" value="5" style="width:100%"></label>
+    <button class="sec" id="clr" style="margin:8px 0 0">Remove this area</button>
+   </div>
+   <div class="note" id="selsum">Tap a body area. You can select several.</div>
+  </div>
+
+  <div class="card"><h2>More details</h2>
+   <div class="row" id="dur"><button data-d="1" aria-pressed="false">Today</button><button data-d="3" aria-pressed="false">2–3 days</button><button data-d="7" aria-pressed="false">A week or more</button></div>
+   <div class="note" style="margin-top:8px">Age</div><div class="row" id="age"><button data-a="0" aria-pressed="false">Under 2</button><button data-a="1" aria-pressed="false">2–12</button><button data-a="2" aria-pressed="false">13–64</button><button data-a="3" aria-pressed="false">65+</button></div>
+   <div class="row" style="margin-top:6px"><button id="preg" aria-pressed="false">Pregnant</button><button id="fvr" aria-pressed="false">Fever</button><button id="bld" aria-pressed="false">Bleeding</button><button id="brt" aria-pressed="false">Short of breath</button></div>
+  </div>
+
+  <div class="card" id="aicard"><h2>On-device AI (optional)</h2>
+   <p class="note">Qwen2.5-0.5B runs in your browser and can only add warning flags, never lower urgency. First load downloads about 500 MB once, then works offline.</p>
+   <button class="sec" id="aiload" style="margin:0">Enable on-device AI</button><progress id="prog" class="hide" value="0" max="100"></progress><div class="note" id="aist">Not loaded. Rules and search work without it.</div></div>
+
+  <button class="go" id="go">Check urgency</button>
+ </div>
+
+ <div id="B" class="hide">
+  <div id="tok"></div>
+  <div class="card"><h2>Why</h2><div id="why"></div></div>
+  <div class="card"><h2>Care near you</h2><div id="fac"></div></div>
+  <div class="card"><h2>Schemes matched from bundled data</h2><div id="sch"></div>
+   <label class="note">Load your own verified schemes JSON: <input type="file" id="jf" accept=".json"></label></div>
+  <div class="card" id="supc"></div>
+  <button class="sec" id="savechk">Save this check to my private records</button><div class="note" id="bmsg" role="status"></div>
+  <div class="card"><h2>Other helplines (not emergencies)</h2><div class="row"><a class="c" href="tel:104">104 Advice</a><a class="c" href="tel:181">181 Women</a><a class="c" href="tel:14416">14416 Tele-MANAS</a></div></div>
+  <button class="sec" id="back">Start a new check</button>
+ </div>
+ <div id="C" class="hide"></div>
+ <div id="D" class="hide"></div>
+</div>
+
+<div class="foot"><div class="disc"><b>Not an official medical diagnosis.</b> Decision support only. Emergency: call 108.</div>
+<nav class="nav" aria-label="Main"><button id="nvA" aria-pressed="true">Check</button><button id="nvB" aria-pressed="false">Results</button><button id="nvC" aria-pressed="false">Specialist</button><button id="nvD" aria-pressed="false">Records</button><button id="srcb">Sources</button></nav></div>
+
+<dialog id="dlg"><h2>Sources &amp; AI provenance</h2>
+<details open><summary>On-device AI (used)</summary><p>Transformers.js with Qwen2.5-0.5B-Instruct (Apache 2.0) for symptom flags, and paraphrase-multilingual-MiniLM-L12-v2 (Apache 2.0) for multilingual semantic matching. Both run in your browser. The AI can only raise urgency.</p></details>
+<details><summary>Triage logic and score (used, not validated)</summary><p>Hand-written rules inspired by MTS-style discriminators. It is not the licensed Manchester Triage System or NHS Pathways. The 0–100 score summarises the rules plus severity, duration and age. The colour is set by the rules, not by the number. A clinician must review this before real use.</p></details>
+<details><summary>Search (used)</summary><p>MiniSearch (MIT) BM25 over scheme entries, re-ranked by embedding similarity when the AI is loaded.</p></details>
+<details><summary>Maps, facilities and specialist search (used)</summary><p>Nearby places and specialist searches use the Mapbox Search Box API, and the optional map uses Mapbox GL JS, with your own Mapbox public token (Mapbox has a free tier; check its current limits and terms). Your approximate location and the search words are sent to Mapbox to find places, and nothing else. Mapbox coverage of Indian health facilities has not been verified, so lists may be thin. Directions open in Google Maps. The Goa referral names (GMC Bambolim, Hospicio Margao, Asilo Mapusa) are shown without phone numbers or coordinates because those were not verified. You can load an official directory CSV (name,tier,lat,lon,phone) on the Results screen.</p></details>
+<details><summary>Government schemes (starter text, unverified)</summary><p>Short summaries of PM-JAY, DDSSY, eSanjeevani, JSY and Jan Aushadhi written from general knowledge. Official sources: pmjay.gov.in, esanjeevani.mohfw.gov.in, nhm.gov.in, janaushadhi.gov.in, and the Goa Directorate of Health Services. The MyScheme portal (myscheme.gov.in) is a good place to check criteria. Load your verified JSON to replace the starter data.</p></details>
+<details><summary>Datasets named in the brief (not bundled)</summary><p>OGD India / Kaggle health centre directories and MyScheme datasets: I could not confirm these exist as described, so nothing is bundled from them. Check the exact dataset and its license before use.</p></details>
+<details><summary>Indic NLP (reference only)</summary><p>IndicNLP and BharatRAG are research resources and are not shipped in this app. Hindi, Marathi and Konkani support here is limited to a small keyword list, multilingual embeddings, and translated result headlines. The Marathi and Konkani wording needs native-speaker review.</p></details>
+<details><summary>Private records and contacts (used)</summary><p>Stored only in this browser's storage on this phone. Encrypted with AES-256-GCM using a key derived from your passphrase (PBKDF2-SHA-256, 310,000 rounds) through the Web Crypto API. There is no account, server or recovery: a forgotten passphrase means the data cannot be read. Limits: clearing browser data deletes it, anyone who learns your passphrase can read it, and a compromised phone can leak it, so keep encrypted backups. This is not a certified medical record system. Messaging your support person or sharing a summary is always your own action. The SMS contains only the urgency colour and, if you tick it, a location link.</p></details>
+<details><summary>Speech (browser)</summary><p>Web Speech API for input and speech synthesis for the Listen button. Konkani uses Hindi (hi-IN) recognition and a Hindi voice to read Konkani text. Quality may vary.</p></details>
+<p class="note">Anatomical map: original SVG drawn for this project.</p>
+<button class="go" onclick="dlg.close()">Close</button></dialog>
+
+<script type="module">
+import MiniSearch from "https://cdn.jsdelivr.net/npm/minisearch@7.1.0/dist/es/index.js";
+const $=i=>document.getElementById(i), dlg=$("dlg");
+/* Paste your free Mapbox PUBLIC token (pk....) here, or the app will ask for it on first use. Restrict it to your site URL in the Mapbox dashboard. */
+const MAPBOX_TOKEN="";
+$("srcb").onclick=()=>dlg.showModal();
+
+/* ---------- Body map: regions [id,label,cx,cy,rx,ry,dx,view,group] ---------- */
+const REG=[
+["head","Head / scalp",100,18,17,16,0,"fb","head"],["eye","Eye",100,17,4,3,8,"f","eye"],["ear","Ear",100,22,3,6,20,"fb","ear"],
+["mouth","Mouth / teeth",100,30,7,3.5,0,"f","mouth"],["neck","Neck",100,47,9,7,0,"fb","neck"],["shoulder","Shoulder",100,64,10,8,38,"fb","joint"],
+["chestA","Chest (front)",100,84,24,14,0,"f","chest"],["ruq","Upper abdomen, right (RUQ)",88,116,12,11,0,"f","abd"],["luq","Upper abdomen, left (LUQ)",112,116,12,11,0,"f","abd"],
+["rlq","Lower abdomen, right (RLQ)",88,140,12,11,0,"f","abd"],["llq","Lower abdomen, left (LLQ)",112,140,12,11,0,"f","abd"],["pelvis","Pelvic region",100,166,14,9,0,"f","abd"],
+["upback","Upper back (posterior chest)",100,84,11,17,18,"b","chest"],["spineC","Spine, cervical",100,52,4,9,0,"b","spine"],["spineT","Spine, thoracic",100,90,4,24,0,"b","spine"],["spineL","Spine, lumbar",100,138,4,16,0,"b","spine"],
+["elbow","Elbow",100,110,6,6,50,"fb","joint"],["wrist","Wrist",100,148,5,5,56,"fb","joint"],["hand","Hand",100,166,6,9,60,"fb","limb"],
+["hip","Hip / buttock",100,184,10,10,28,"fb","joint"],["thigh","Thigh",100,222,9,20,16,"fb","limb"],["knee","Knee",100,262,8,8,15,"fb","joint"],
+["shin","Lower leg",100,300,7,20,14,"fb","limb"],["ankle","Ankle",100,338,6,5,14,"fb","joint"],["foot","Foot",100,358,7,9,14,"fb","limb"]];
+let view="f",active=null,S={}; // S[key]={label,grp,depth,ptype,sev}
+const SIL='<path class="sil" d="M72 60h56v136H72z"/><circle class="sil" cx="100" cy="20" r="16"/><path class="sil" d="M66 66L50 112 56 150 60 176M134 66l16 46-6 38 -4 26M88 196l-2 70 1 80M112 196l2 70-1 80"/>';
+function drawMap(){
+ let h=SIL;
+ REG.forEach(r=>{ if(!r[7].includes(view))return;
+  const sides=r[6]?[[view=="f"?"R":"L",r[2]-r[6]],[view=="f"?"L":"R",r[2]+r[6]]]:[["",r[2]]];
+  sides.forEach(([s,cx])=>{const k=r[0]+s,lab=(s?(s=="R"?"Right ":"Left "):"")+r[1];
+   const cls="reg"+(S[k]?" sel":"")+(active==k?" act":"");
+   h+=`<ellipse class="${cls}" data-k="${k}" data-g="${r[8]}" data-n="${lab}" cx="${cx}" cy="${r[3]}" rx="${r[4]||4}" ry="${r[5]||4}" tabindex="0" role="button" aria-label="${lab}"/>`})});
+ $("svg").innerHTML=h;
+ $("svg").querySelectorAll(".reg").forEach(e=>{e.onclick=()=>pick(e);e.onkeydown=ev=>{if(ev.key=="Enter"||ev.key==" "){ev.preventDefault();pick(e)}}});
+ $("selsum").textContent=Object.keys(S).length?"Selected: "+Object.values(S).map(s=>s.label+" ("+s.sev+"/10)").join(", "):"Tap a body area. You can select several.";
+}
+const DEP=["Skin / rash","Muscle / bone / joint","Deep / internal"],TYP=["Sharp","Dull / aching","Burning","Throbbing","Numbness / tingling"];
+function chips(id,opts,cur,cb){$(id).innerHTML="";opts.forEach((o,i)=>{const b=document.createElement("button");b.textContent=o;b.setAttribute("aria-pressed",cur==i);b.onclick=()=>{cb(i);chips(id,opts,i,cb)};$(id).appendChild(b)})}
+function pick(e){const k=e.dataset.k;active=k;
+ if(!S[k])S[k]={label:e.dataset.n,grp:e.dataset.g,depth:2,ptype:1,sev:5};
+ $("sub").classList.remove("hide");$("subt").textContent=S[k].label;
+ chips("depth",DEP,S[k].depth,i=>S[k].depth=i);chips("ptype",TYP,S[k].ptype,i=>S[k].ptype=i);
+ $("sev").value=S[k].sev;sevUI(S[k].sev);drawMap()}
+const sevUI=v=>{$("sevv").textContent=v;$("sevl").textContent=v>=9?"Emergency":v>=7?"Severe":v>=4?"Moderate":"Mild"};
+$("sev").oninput=e=>{if(active){S[active].sev=+e.target.value;sevUI(+e.target.value);drawMap()}};
+$("clr").onclick=()=>{delete S[active];active=null;$("sub").classList.add("hide");drawMap()};
+$("view").querySelectorAll("button").forEach(b=>b.onclick=()=>{view=b.dataset.v;$("view").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b));drawMap()});
+drawMap();
+["dur"].forEach(()=>{});let days=0,age=-1,done=false;
+$("age").querySelectorAll("button").forEach(b=>b.onclick=()=>{age=+b.dataset.a;$("age").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b))});
+$("dur").querySelectorAll("button").forEach(b=>b.onclick=()=>{days=+b.dataset.d;$("dur").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b))});
+["preg","fvr","bld","brt"].forEach(i=>$(i).onclick=()=>$(i).setAttribute("aria-pressed",$(i).getAttribute("aria-pressed")!="true"));
+const on=i=>$(i).getAttribute("aria-pressed")=="true";
+
+/* ---------- Speech ---------- */
+let lang="en-IN",rec=null;
+$("langs").querySelectorAll("button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;$("langs").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x==b));
+ $("lnote").textContent=lang=="kok"?"Browsers have no Konkani recognizer. Using Hindi (Devanagari) recognition, which may mishear Konkani. Edit the text if needed.":""});
+$("mic").onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){$("lnote").textContent="Voice input is not supported in this browser. Please type.";return}
+ if(rec){rec.stop();return}
+ rec=new SR();rec.lang=lang=="kok"?"hi-IN":lang;rec.onresult=e=>{$("txt").value+=" "+e.results[0][0].transcript};
+ rec.onend=()=>{rec=null;$("mic").setAttribute("aria-pressed","false")};rec.onerror=()=>{$("lnote").textContent="Could not hear you. Please type."};
+ try{rec.start();$("mic").setAttribute("aria-pressed","true")}catch(e){rec=null}};
+
+/* ---------- Triage data: features, lexicon, rules ---------- */
+const LEX=[[/chest pain|छाती|सीने|छातीत|छातींत/i,"chest_pain"],[/breath|सांस|श्वास|दम/i,"breathless"],[/sweat|पसीना|घाम/i,"sweating"],[/unconscious|faint|बेहोश|बेशुद्ध/i,"unconscious"],
+[/seizure|fits|convuls|दौरा|झटके/i,"seizure"],[/one side|weakness.*(arm|leg|face)|slurred|लकवा|एक बाजू/i,"weak_one_side"],[/bleed|blood|खून|रक्त|रक्तस्राव/i,"bleeding"],
+[/fever|temperature|बुखार|ताप|ज्वर/i,"fever"],[/vomit|उल्टी|उलटी|उलट्या/i,"vomiting"],[/loose motion|diarr|दस्त|जुलाब/i,"diarrhoea"],[/cough|खांसी|खोकला|खोंकी/i,"cough"],[/rash|itch|खुजली|पुरळ/i,"rash"],[/injur|fall|fell|fracture|चोट|मार|पडलो/i,"injury"]];
+const RULES=[
+{l:"red",why:"Chest pain with breathlessness, sweating or severe intensity (possible cardiac emergency)",all:["chest_pain"],any:["breathless","sweating","severe"]},
+{l:"red",why:"Unconsciousness, seizure, one-sided weakness, or numbness with head symptoms (possible stroke or neurological emergency)",any:["unconscious","seizure","weak_one_side","head_numb"]},
+{l:"red",why:"Pain rated 9–10 out of 10",all:["crit"]},
+{l:"red",why:"Bleeding with severe pain, or bleeding in pregnancy",any:["bleed_severe","preg_bleed"]},
+{l:"orange",why:"Right lower abdominal pain with severe pain, fever or vomiting (appendicitis pattern)",all:["rlq"],any:["severe","fever","vomiting"]},
+{l:"orange",why:"Shortness of breath",all:["breathless"]},
+{l:"orange",why:"Severe head or abdominal pain",any:["head_severe","abd_severe"]},
+{l:"orange",why:"Pregnancy with pain, headache or bleeding",all:["pregnant"],any:["abd_pain","head_pain","bleeding"]},
+{l:"orange",why:"Bleeding",all:["bleeding"]},
+{l:"orange",why:"Fever, vomiting or diarrhoea in a child under 2",all:["infant"],any:["fever","vomiting","diarrhoea"]},
+{l:"yellow",why:"Fever, vomiting, diarrhoea, injury, rash, pain or numbness needing a clinician within a day",any:["fever","vomiting","diarrhoea","injury","moderate","cough","rash","abd_pain","head_pain","back_pain","numb","chest_pain"]}];
+const ORD=["green","yellow","orange","red"];
+function features(txt){const F=new Set();
+ Object.values(S).forEach(s=>{const g=s.grp,sv=s.sev,k=s.label;
+  if(g=="chest"&&s.ptype!=4)F.add("chest_pain");if(g=="head"){F.add("head_pain");if(s.ptype==4)F.add("head_numb");if(sv>=7)F.add("head_severe")}
+  if(g=="abd"){F.add("abd_pain");if(sv>=7)F.add("abd_severe");if(/RLQ/.test(k))F.add("rlq")} if(g=="spine")F.add("back_pain");
+  if(s.depth==0)F.add("rash");if(s.ptype==4)F.add("numb");if(sv>=4)F.add("moderate");if(sv>=7)F.add("severe");if(sv>=9)F.add("crit")});
+ LEX.forEach(([re,f])=>{if(re.test(txt))F.add(f)});
+ if(age==0)F.add("infant");if(age==3)F.add("elder");if(on("preg"))F.add("pregnant");if(on("fvr"))F.add("fever");if(on("bld"))F.add("bleeding");if(on("brt"))F.add("breathless");
+ if(F.has("bleeding")&&F.has("severe"))F.add("bleed_severe");if(F.has("bleeding")&&F.has("pregnant"))F.add("preg_bleed");
+ return F}
+function evaluate(F){const hit=RULES.filter(r=>(!r.all||r.all.every(x=>F.has(x)))&&(!r.any||r.any.some(x=>F.has(x))));
+ let lvl="green";hit.forEach(r=>{if(ORD.indexOf(r.l)>ORD.indexOf(lvl))lvl=r.l});
+ if(lvl=="green"&&days>=7){lvl="yellow";hit.push({l:"yellow",why:"Symptoms lasting a week or more"})}
+ return{lvl,hit}}
+const BAND={green:[5,39],yellow:[40,59],orange:[60,74],red:[75,100]};
+function score(lvl,n){const mx=Math.max(0,...Object.values(S).map(s=>s.sev));const w=.45*mx/10+.2*(days>=7?1:days>=3?.6:days?.3:0)+.15*(age==0||age==3?1:age==1?.5:0)+.2*Math.min(n,4)/4;const [lo,hi]=BAND[lvl];return Math.round(lo+(hi-lo)*Math.min(w,1))}
+const L10={en:{red:"Emergency: call 108 now",orange:"See a doctor urgently, today",yellow:"See a doctor within 24 hours",green:"Routine care"},
+hi:{red:"आपातकाल: अभी 108 पर कॉल करें",orange:"आज ही डॉक्टर को दिखाएं",yellow:"24 घंटे के भीतर डॉक्टर को दिखाएं",green:"सामान्य देखभाल: नज़दीकी स्वास्थ्य केंद्र जाएं"},
+mr:{red:"आणीबाणी: आत्ताच 108 ला फोन करा",orange:"आजच डॉक्टरांना दाखवा",yellow:"24 तासांत डॉक्टरांना दाखवा",green:"सामान्य काळजी: जवळच्या आरोग्य केंद्रात जा"},
+kok:{red:"तातडीची गरज: आतां 108 क फोन करात",orange:"आयज सकयल डॉक्टराक दाखयात",yellow:"24 वरांभितर डॉक्टराक दाखयात",green:"सामान्य काळजी: लागीच्या आरोग्य केंद्रांत वचात"}};
+const lk=()=>({"en-IN":"en","hi-IN":"hi","mr-IN":"mr",kok:"kok"}[lang]);
+const speak=t=>{if(!("speechSynthesis" in window))return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=lang=="kok"?"hi-IN":lang;speechSynthesis.speak(u)};
+const ACTION={red:["Emergency: call 108 now","Do not travel alone or wait. Go to the nearest hospital emergency."],orange:["See a doctor urgently, today","Go to the nearest hospital or CHC. Call 108 if it gets worse."],
+yellow:["See a doctor within 24 hours","Use an eSanjeevani tele-consult or visit your PHC."],green:["Routine care","Visit your PHC if it continues. Watch for new symptoms."]};
+
+/* ---------- Worker: Transformers.js (LLM + embeddings) ---------- */
+let worker=null,ready=false,pend={},pid=0;
+const WSRC=`import {pipeline} from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2";
+let gen,emb;onmessage=async e=>{const {k,id,p}=e.data;try{
+if(k=="load"){const dev=navigator.gpu?"webgpu":"wasm";
+ gen=await pipeline("text-generation","onnx-community/Qwen2.5-0.5B-Instruct",{device:dev,dtype:dev=="webgpu"?"q4f16":"q8",progress_callback:x=>postMessage({k:"prog",x})});
+ emb=await pipeline("feature-extraction","Xenova/paraphrase-multilingual-MiniLM-L12-v2",{dtype:"q8"});postMessage({k:"ready",id,dev});}
+if(k=="tags"){const o=await gen([{role:"system",content:"You are a triage assistant. Reply ONLY with comma-separated tags from this list that clearly apply: chest_pain, breathless, sweating, unconscious, seizure, weak_one_side, bleeding, fever, vomiting, injury, none. No other words."},{role:"user",content:p}],{max_new_tokens:24,do_sample:false});postMessage({k:"res",id,v:o[0].generated_text.at(-1).content});}
+if(k=="embed"){const o=await emb(p,{pooling:"mean",normalize:true});postMessage({k:"res",id,v:o.tolist()});}
+}catch(err){postMessage({k:"err",id,v:String(err)})}}`;
+const call=(k,p)=>new Promise((res,rej)=>{const id=++pid;pend[id]={res,rej};worker.postMessage({k,id,p})});
+$("aiload").onclick=()=>{if(worker)return;$("aiload").disabled=true;$("prog").classList.remove("hide");
+ try{worker=new Worker(URL.createObjectURL(new Blob([WSRC],{type:"text/javascript"})),{type:"module"})}catch(e){$("aist").textContent="This browser cannot start the AI worker.";return}
+ worker.onmessage=e=>{const m=e.data;
+  if(m.k=="prog"&&m.x.status=="progress"){$("prog").value=m.x.progress;$("aist").textContent="Downloading "+(m.x.file||"model")+" "+Math.round(m.x.progress)+"%"}
+  if(m.k=="ready"){ready=true;$("prog").classList.add("hide");$("aist").textContent="AI ready ("+m.dev+"). Runs on this device."}
+  if(m.k=="res"||m.k=="err"){const p=pend[m.id];if(p){m.k=="res"?p.res(m.v):p.rej(m.v);delete pend[m.id]}}
+  if(m.k=="err"&&!pend[m.id]){$("aist").textContent="AI failed to load: "+m.v+". Rules and search still work.";$("aiload").disabled=false;worker=null}};
+ worker.onerror=()=>{$("aist").textContent="AI could not start here. Rules and search still work.";worker=null;$("aiload").disabled=false};
+ worker.postMessage({k:"load",id:0})};
+
+/* ---------- Scheme RAG (bundled starter data; replace via JSON loader) ---------- */
+let SCH=[
+{id:"pmjay",name:"Ayushman Bharat PM-JAY",when:"hosp",url:"https://pmjay.gov.in",text:"Cashless hospitalisation cover up to Rs 5 lakh per family per year at empanelled public and private hospitals, secondary and tertiary care under Health Benefit Packages. Check your card or eligibility at the hospital Ayushman Mitra desk.",procs:"surgery operation appendectomy hernia fracture orthopaedic cardiac angioplasty bypass cataract dialysis cancer chemotherapy caesarean icu admission hospitalisation"},
+{id:"ddssy",name:"Goa DDSSY (Deen Dayal Swasthya Seva Yojana)",when:"hosp",url:null,text:"Goa state health cover for eligible Goa residents for listed hospitalisation procedures at empanelled hospitals. Confirm the current approved procedure list and eligibility with the Goa Directorate of Health Services or hospital help desk.",procs:"surgery operation hospitalisation fracture cardiac cataract delivery admission"},
+{id:"esan",name:"eSanjeevani tele-consultation",when:"tele",url:"https://esanjeevani.mohfw.gov.in",text:"Free government video consultation with doctors for non-emergency problems such as fever, cough, rash, stomach upset and follow-up. Check the portal for OPD timings.",procs:"fever cough rash vomiting diarrhoea mild follow-up consultation"},
+{id:"jsy",name:"Janani Suraksha Yojana (JSY)",when:"preg",url:"https://nhm.gov.in",text:"National Health Mission scheme promoting institutional delivery. Contact your ASHA or ANM to check eligibility in your state.",procs:"pregnancy delivery maternal antenatal caesarean"},
+{id:"jan",name:"Jan Aushadhi (PMBJP)",when:"rx",url:"https://janaushadhi.gov.in",text:"Quality generic medicines at lower prices at Jan Aushadhi Kendras. Ask the doctor to write generic names on the prescription.",procs:"medicine prescription generic tablets"}];
+const fmap={chest_pain:"cardiac angioplasty",rlq:"appendectomy surgery",injury:"fracture orthopaedic",pregnant:"pregnancy delivery",eye:"cataract",fever:"fever",cough:"cough",rash:"rash",vomiting:"vomiting",diarrhoea:"diarrhoea"};
+const loadSch=async e=>{try{const j=JSON.parse(await e.target.files[0].text());if(Array.isArray(j)&&j.every(x=>x.id&&x.name&&x.text)){SCH=j;$("sch").insertAdjacentHTML("afterbegin",'<p class="note">Loaded '+j.length+' entries from your file. Run the check again to apply.</p>')}else throw 0}catch{$("sch").insertAdjacentHTML("afterbegin",'<p class="note">Invalid file. Needs a JSON array of {id,name,text,when,procs,url}.</p>')}};
+$("jf").onchange=loadSch;
+async function schemes(F,lvl,txt){
+ const ms=new MiniSearch({fields:["name","text","procs"],storeFields:["id"],searchOptions:{boost:{procs:2},fuzzy:.2,prefix:true}});ms.addAll(SCH);
+ const q=[...F].map(f=>fmap[f]||"").join(" ")+" "+txt+" "+lvl;const hits=Object.fromEntries(ms.search(q,{combineWith:"OR"}).map(h=>[h.id,h]));
+ const okw={hosp:lvl=="red"||lvl=="orange"||(hits.pmjay&&["surgery","fracture","cardiac"].some(w=>(hits.pmjay.terms||[]).includes(w))),tele:lvl=="yellow"||lvl=="green",preg:F.has("pregnant"),rx:lvl=="yellow"||lvl=="green"};
+ let out=SCH.filter(s=>okw[s.when]!==false&&(okw[s.when]||s.when==undefined)).map(s=>({s,sc:hits[s.id]?hits[s.id].score:0,terms:hits[s.id]?hits[s.id].terms:[]}));
+ if(ready&&out.length>1){try{const v=await call("embed",[q,...out.map(o=>o.s.text)]);const cos=(a,b)=>a.reduce((t,x,i)=>t+x*b[i],0);out.forEach((o,i)=>o.sc=o.sc/(1+o.sc)+cos(v[0],v[i+1]))}catch{}}
+ return out.sort((a,b)=>b.sc-a.sc)}
+
+/* ---------- Facilities: Mapbox Search Box API ---------- */
+const hav=(a,b,c,d)=>{const R=6371,t=x=>x*Math.PI/180,dl=t(c-a),dn=t(d-b),x=Math.sin(dl/2)**2+Math.cos(t(a))*Math.cos(t(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+/* ---------- Mapbox helpers ---------- */
+const mbt=()=>MAPBOX_TOKEN||ls.get("hs_mbt")||"";
+const GM="https://www.google.com/maps/search/hospital+near+me";
+const dirU=x=>`https://www.google.com/maps/dir/?api=1&destination=${x.la},${x.lo}`;
+async function mbSearch(q,la,lo){const r=await fetch(`https://api.mapbox.com/search/searchbox/v1/forward?q=${encodeURIComponent(q)}&proximity=${lo},${la}&country=in&limit=10&language=en&access_token=${encodeURIComponent(mbt())}`);
+ if(!r.ok)throw new Error(String(r.status));const j=await r.json();
+ return(j.features||[]).map(f=>{const p=f.properties||{},c=f.geometry.coordinates;return{n:p.name,la:c[1],lo:c[0],d:hav(la,lo,c[1],c[0]),addr:p.full_address||p.place_formatted||"",ph:p.metadata&&p.metadata.phone}})}
+const item=(x,tag)=>`<div class="it"><b>${esc(x.n)}</b> <span class="tag">${x.d.toFixed(1)} km</span>${x.f?`<span class="tag">${esc(x.t||"your file")}</span>`:""}${tag||""}<br>${x.addr?`<span class="note">${esc(x.addr)}</span><br>`:""}<a class="lnk" href="${dirU(x)}" target="_blank" rel="noopener">Directions</a>${x.ph?` · <a class="lnk" href="tel:${esc(String(x.ph).split(/[;,]/)[0].replace(/\s/g,""))}">Call</a>`:""}</div>`;
+function needTok(el,retry){el.innerHTML='<p class="note">Maps and search use Mapbox. Paste your free Mapbox public token (starts with pk.) to continue. It is stored only on this phone.</p><input type="text" id="tkin" placeholder="pk...."><button class="sec" id="tksave">Save token</button>';$("tksave").onclick=()=>{const v=$("tkin").value.trim();if(!/^pk\./.test(v))return;ls.set("hs_mbt",v);retry()}}
+let GL=null;
+const loadGL=()=>GL||(GL=new Promise((res,rej)=>{const l=document.createElement("link");l.rel="stylesheet";l.href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css";document.head.appendChild(l);const sc=document.createElement("script");sc.src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js";sc.onload=res;sc.onerror=()=>{GL=null;rej()};document.head.appendChild(sc)}));
+async function drawMB(id,items,me){const el=$(id);el.style.height="260px";el.style.borderRadius="10px";el.style.marginTop="8px";
+ try{await loadGL();mapboxgl.accessToken=mbt();const m=new mapboxgl.Map({container:id,style:"mapbox://styles/mapbox/streets-v12",center:[me.lo,me.la],zoom:11});
+  new mapboxgl.Marker({color:"#1A237E"}).setLngLat([me.lo,me.la]).setPopup(new mapboxgl.Popup().setText("You are here")).addTo(m);
+  const b=new mapboxgl.LngLatBounds([me.lo,me.la],[me.lo,me.la]);
+  items.forEach(x=>{new mapboxgl.Marker({color:"#E65100"}).setLngLat([x.lo,x.la]).setPopup(new mapboxgl.Popup().setText(x.n)).addTo(m);b.extend([x.lo,x.la])});m.fitBounds(b,{padding:40,maxZoom:14})}
+ catch{el.textContent="Could not load the map."}}
+let DIR=[];
+const ANCH=[["Goa Medical College &amp; Hospital, Bambolim","Tertiary hospital"],["Hospicio Hospital, Margao (South Goa District Hospital)","District hospital"],["Asilo Hospital, Mapusa (North Goa District Hospital)","District hospital"]];
+const loadCsv=async e=>{try{const [h,...r]=(await e.target.files[0].text()).trim().split(/\r?\n/);const c=h.toLowerCase().split(",").map(x=>x.trim());
+ DIR=r.map(l=>{const v=l.split(",");const o={};c.forEach((k,i)=>o[k]=(v[i]||"").trim());return{n:o.name,t:o.tier,la:+o.lat,lo:+o.lon,ph:o.phone}}).filter(x=>x.n&&!isNaN(x.la)&&!isNaN(x.lo));
+ $("near").insertAdjacentHTML("beforebegin",'<p class="note">Loaded '+DIR.length+' facilities. Run the check again to include them.</p>')}catch{}};
+function facilities(lvl){const hi=lvl=="red"||lvl=="orange";
+ $("fac").innerHTML=(hi?'<div class="note">Goa referral hospitals (names only; phone numbers not verified. Call 108 for an ambulance):</div>'+ANCH.map(x=>`<div class="it"><b>${x[0]}</b><span class="tag">${x[1]}</span><br><a class="lnk" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x[0].replace(/&amp;/g,"and"))}" target="_blank" rel="noopener">Find on map</a></div>`).join(""):"")+'<div id="near"></div><label class="note">Official directory CSV (name,tier,lat,lon,phone): <input type="file" id="csv" accept=".csv"></label>';
+ $("csv").onchange=loadCsv;const el=$("near");el.innerHTML='<p class="note">Finding places near you…</p>';
+ if(!navigator.geolocation){el.innerHTML=`<p class="note">Location is not available. <a class="lnk" href="${GM}">Search hospitals on Google Maps</a></p>`;return}
+ navigator.geolocation.getCurrentPosition(p=>{const {latitude:a,longitude:b}=p.coords;
+  const run=async()=>{if(!mbt()){needTok(el,run);return}el.innerHTML='<p class="note">Searching…</p>';
+   try{const Q=hi?["hospital","government hospital"]:["primary health centre","community health centre","clinic"];
+    const R=(await Promise.all(Q.map(q=>mbSearch(q,a,b)))).flat(),seen=new Set();
+    const L=R.concat(DIR.map(x=>({...x,d:hav(a,b,x.la,x.lo),f:1}))).filter(x=>x.n&&!seen.has(x.n)&&seen.add(x.n)).sort((x,y)=>x.d-y.d).slice(0,6);
+    el.innerHTML=L.length?L.map(x=>item(x)).join("")+'<button class="sec" id="mbtnF" style="margin-top:8px">Show on map</button><div id="mapF"></div><p class="note">Place data © Mapbox and its suppliers. Listings may be incomplete or outdated. No live queue data.</p>':'<p class="note">No listings found nearby. Call 104 for help.</p>';
+    if($("mbtnF"))$("mbtnF").onclick=()=>drawMB("mapF",L,{la:a,lo:b})}
+   catch(e){el.innerHTML='<p class="note">Could not load nearby places ('+(e&&e.message=="401"?"check your Mapbox token":"offline or service busy")+'). Call 104 for help.</p>'}};
+  run()},
+ ()=>{el.innerHTML=`<p class="note">Location permission denied. <a class="lnk" href="${GM}">Search on Google Maps</a>. Call 104 for help finding a facility.</p>`},{timeout:10000})}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- Run ---------- */
+$("go").onclick=async()=>{const txt=$("txt").value;let F=features(txt),aiAdded=[];
+ if(ready){try{$("go").textContent="AI reading…";const o=await call("tags",txt+" | "+Object.values(S).map(s=>s.label+" "+TYP[s.ptype]+" "+s.sev+"/10").join("; "));
+  o.toLowerCase().split(/[,\s]+/).forEach(t=>{if(t&&t!="none"&&["chest_pain","breathless","sweating","unconscious","seizure","weak_one_side","bleeding","fever","vomiting","injury"].includes(t)&&!F.has(t)){F.add(t);aiAdded.push(t)}})}catch{}
+  $("go").textContent="Check urgency"}
+ const {lvl,hit}=evaluate(F);const a=ACTION[lvl];
+ const sc=score(lvl,hit.length),T=L10[lk()][lvl];
+ $("tok").innerHTML=`<div class="tok ${lvl}" role="status"><small>Triage token: ${lvl} · urgency score ${sc}/100</small><div class="gauge"><i style="width:${sc}%"></i></div><b>${T}</b>${lk()=="en"?"":a[0]+"<br>"}${a[1]}${lvl=="red"?"<br><b>Use the Call 108 button at the top.</b>":""}<br><button class="c" id="spk" style="margin-top:8px;color:#222">🔊 Listen</button></div>`;
+ $("spk").onclick=()=>speak(T+". "+(lvl=="red"?"108":""));
+ $("why").innerHTML=(hit.length?hit.map(r=>`<div class="it">${esc(r.why)}<span class="tag">rule · ${r.l}</span></div>`).join(""):'<div class="it">No warning signs found in what you entered.</div>')
+  +(aiAdded.length?`<div class="it">On-device AI added flags: ${esc(aiAdded.join(", "))}<span class="tag">can only raise urgency</span></div>`:"")
+  +'<p class="note">Rules are MTS-style and not clinically validated. If you feel worse, call 108.</p>';
+ done=true;LAST={ts:Date.now(),lvl,sc,txt,regions:Object.values(S).map(x=>x.label+" "+x.sev+"/10"),grps:[...new Set(Object.values(S).map(x=>x.grp))],flags:[...F],why:hit.map(r=>r.why)};show("B");
+ $("sch").innerHTML='<p class="note">Matching…</p>';
+ const L=await schemes(F,lvl,txt);
+ $("sch").innerHTML=(L.length?L.map(o=>`<div class="it"><b>${esc(o.s.name)}</b>${o.terms.length?'<span class="tag">matched: '+esc(o.terms.slice(0,4).join(", "))+"</span>":""}<br><span class="note">${esc(o.s.text)}</span>${o.s.url?`<br><a class="lnk" href="${o.s.url}" target="_blank" rel="noopener">Official site</a>`:""}</div>`).join(""):"<p class='note'>No schemes matched.</p>")
+  +'<p class="note">Starter summaries only. Verify eligibility and covered procedures on the official site or with the hospital before relying on them.</p>'
+  +'<label class="note">Load your own verified schemes JSON: <input type="file" id="jf2" accept=".json"></label>';
+ $("jf2").onchange=loadSch;
+ facilities(lvl)};
+/*VAULT-CORE*/
+const VK="hs_vault_v1",enc=new TextEncoder(),dec=new TextDecoder();let KEY=null,V=null,LAST=null,lockT=null;
+const ls={get:k=>{try{return localStorage.getItem(k)}catch{return null}},set:(k,v)=>{try{localStorage.setItem(k,v);return true}catch{return false}},del:k=>{try{localStorage.removeItem(k)}catch{}}};
+const b64=u=>{let t="";new Uint8Array(u).forEach(c=>t+=String.fromCharCode(c));return btoa(t)},ub=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0));
+const derive=async(pw,salt,it)=>{const m=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:it,hash:"SHA-256"},m,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])};
+const meta=()=>{try{return JSON.parse(ls.get(VK))}catch{return null}};
+async function seal(){const m=meta();if(!m||!KEY)return false;const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},KEY,enc.encode(JSON.stringify(V)));m.iv=b64(iv);m.ct=b64(ct);return ls.set(VK,JSON.stringify(m))}
+async function create(pw){const salt=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(pw,salt,310000);V={profile:{},records:[],contacts:[]};
+ if(!ls.set(VK,JSON.stringify({v:1,it:310000,salt:b64(salt)}))||!(await seal())){KEY=V=null;ls.del(VK);throw new Error("storage")}}
+async function unlock(pw){const m=meta();const k=await derive(pw,ub(m.salt),m.it);const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(m.iv)},k,ub(m.ct));KEY=k;V=JSON.parse(dec.decode(pt))}
+/*END-CORE*/
+const save=async()=>{arm();return KEY?seal():false};
+const lock=()=>{KEY=V=null;clearTimeout(lockT);renderD();renderSupport()};
+const arm=()=>{clearTimeout(lockT);if(KEY)lockT=setTimeout(lock,180000)};
+["pointerdown","keydown"].forEach(e=>addEventListener(e,arm));addEventListener("pagehide",()=>{KEY=V=null});
+const say=t=>["dmsg","bmsg"].forEach(i=>{const e=$(i);if(e)e.textContent=t});
+const SC=["A","B","C","D"];
+const show=id=>{SC.forEach(k=>{$(k).classList.toggle("hide",k!=id);$("nv"+k).setAttribute("aria-pressed",k==id)});if(id=="D")renderD();if(id=="C")renderC();if(id=="B")renderSupport();scrollTo(0,0)};
+$("back").onclick=()=>show("A");$("nvA").onclick=()=>show("A");$("nvC").onclick=()=>show("C");$("nvD").onclick=()=>show("D");$("nvB").onclick=()=>{if(done)show("B")};
+
+/* ---- Records screen ---- */
+function renderD(){const el=$("D"),m=meta();
+ if(!(window.crypto&&crypto.subtle)){el.innerHTML='<div class="card"><h2>Private records</h2><p class="note">Secure storage needs this page to be opened over HTTPS.</p></div>';return}
+ const imp='<label class="note" style="display:block;margin-top:8px">Restore an encrypted backup: <input type="file" id="imp" accept=".json"></label>';
+ if(!m){el.innerHTML=`<div class="card"><h2>My private health locker</h2><p class="note">Your records stay on this phone, encrypted with a passphrase only you know (AES-256). There is no account and no server. <b>If you forget the passphrase, nobody can recover your data.</b></p><input type="password" id="pw1" placeholder="Passphrase (8+ characters)" autocomplete="new-password"><input type="password" id="pw2" placeholder="Repeat passphrase" autocomplete="new-password"><button class="go" id="cr">Create locker</button><div class="note" id="dmsg" role="status"></div>${imp}</div>`;
+  $("cr").onclick=async()=>{const a=$("pw1").value;if(a.length<8){$("dmsg").textContent="Use at least 8 characters.";return}if(a!==$("pw2").value){$("dmsg").textContent="Passphrases do not match.";return}
+   $("cr").disabled=true;$("dmsg").textContent="Creating…";try{await create(a);arm();renderD();say("Locker created. Add your profile and a support contact.")}catch{$("cr").disabled=false;$("dmsg").textContent="Could not store data on this device (storage blocked?)."}}}
+ else if(!KEY){el.innerHTML=`<div class="card"><h2>Locker is locked</h2><input type="password" id="pw" placeholder="Passphrase" autocomplete="current-password"><button class="go" id="ul">Unlock</button><div class="note" id="dmsg" role="status"></div><button class="x" id="wipe">Forgot the passphrase? Erase the locker</button>${imp}</div>`;
+  $("ul").onclick=async()=>{$("ul").disabled=true;$("dmsg").textContent="Unlocking…";try{await unlock($("pw").value);arm();renderD();renderSupport()}catch{$("ul").disabled=false;$("dmsg").textContent="Wrong passphrase, or the data is damaged."}};
+  $("wipe").onclick=()=>{if(confirm("Erase your locker permanently? This cannot be undone.")){ls.del(VK);lock()}}}
+ else{const p=V.profile,bg=["","A+","A-","B+","B-","AB+","AB-","O+","O-"];
+  el.innerHTML=`<div class="note" id="dmsg" role="status"></div><div class="card"><h2>Profile</h2><input type="text" id="pn" placeholder="Name" value="${esc(p.name||"")}"><input type="number" id="pa" placeholder="Age (years)" value="${esc(p.age||"")}"><select id="pb" aria-label="Blood group">${bg.map(x=>`<option value="${x}" ${p.bg==x?"selected":""}>${x||"Blood group"}</option>`).join("")}</select><textarea id="pal" placeholder="Allergies">${esc(p.allergy||"")}</textarea><textarea id="pc" placeholder="Existing conditions">${esc(p.cond||"")}</textarea><textarea id="pm" placeholder="Regular medicines">${esc(p.meds||"")}</textarea><button class="go" id="saveP" style="margin-top:6px">Save profile</button></div>
+<div class="card"><h2>Support contacts</h2><p class="note">A relative or friend to alert if you need help. Up to 3.</p>${V.contacts.map((c,i)=>`<div class="it"><b>${esc(c.n)}</b> <span class="tag">${esc(c.r||"contact")}</span><br>${esc(c.p)} <button class="x" data-dc="${i}">Remove</button></div>`).join("")}${V.contacts.length<3?'<input type="text" id="cn" placeholder="Name"><input type="text" id="cr2" placeholder="Relation (e.g. daughter)"><input type="tel" id="cph" placeholder="Phone number"><button class="sec" id="addC">Add contact</button>':""}</div>
+<div class="card"><h2>Records</h2>${V.records.length?V.records.map((r,i)=>`<div class="it"><span class="note">${esc(new Date(r.ts).toLocaleString())}</span> <b>${esc(r.type)}</b>${r.lvl?`<span class="lv ${r.lvl}">${r.lvl} ${r.sc}/100</span>`:""}<br>${esc(r.text)} <button class="x" data-dr="${i}">Delete</button></div>`).join(""):'<p class="note">Nothing saved yet. Save a check from the Results screen, or add a note below.</p>'}<select id="rt" aria-label="Note type"><option>Visit</option><option>Test result</option><option>Prescription</option><option>Other</option></select><textarea id="rx" placeholder="Note: what the doctor said, a test value, a medicine"></textarea><button class="sec" id="addR">Add note</button></div>
+<div class="card"><h2>Data and privacy</h2><p class="note">Encrypted on this phone only. The locker locks itself after 3 minutes without use. Browser data cleanup deletes it, so keep a backup.</p><div class="row"><button id="exp">Export encrypted backup</button><button id="lk">Lock now</button><button class="x" id="wipe2">Erase everything</button></div>${imp}</div>`;
+  $("saveP").onclick=async()=>{V.profile={name:$("pn").value.trim(),age:$("pa").value.trim(),bg:$("pb").value,allergy:$("pal").value.trim(),cond:$("pc").value.trim(),meds:$("pm").value.trim()};say(await save()?"Profile saved (encrypted).":"Could not save.")};
+  if($("addC"))$("addC").onclick=async()=>{const n=$("cn").value.trim(),r=$("cr2").value.trim(),ph=$("cph").value.trim();if(!n||!/^\+?[0-9 ]{10,14}$/.test(ph)){say("Enter a name and a valid phone number.");return}V.contacts.push({n,r,p:ph});const ok=await save();renderD();say(ok?"Contact saved.":"Could not save.")};
+  el.querySelectorAll("[data-dc]").forEach(b=>b.onclick=async()=>{V.contacts.splice(+b.dataset.dc,1);await save();renderD()});
+  el.querySelectorAll("[data-dr]").forEach(b=>b.onclick=async()=>{V.records.splice(+b.dataset.dr,1);await save();renderD()});
+  $("addR").onclick=async()=>{const t=$("rx").value.trim();if(!t)return;V.records.unshift({id:Date.now(),ts:Date.now(),type:$("rt").value,text:t.slice(0,2000)});const ok=await save();renderD();say(ok?"Note saved.":"Could not save.")};
+  $("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([ls.get(VK)||"{}"],{type:"application/json"}));a.download="healthsetu-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),5000)};
+  $("lk").onclick=lock;$("wipe2").onclick=()=>{if(confirm("Erase all records and contacts on this phone? This cannot be undone.")){ls.del(VK);lock()}}}
+ if($("imp"))$("imp").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const t=await f.text(),j=JSON.parse(t);if(!(j.salt&&j.iv&&j.ct&&j.it))throw 0;if(meta()&&!confirm("Replace the locker on this phone with this backup?"))return;ls.set(VK,t);KEY=V=null;renderD();say("Backup restored. Unlock it with the passphrase you used when you made it.")}catch{say("That file is not a valid HealthSetu backup.")}};
+}
+
+/* ---- Support person (Results screen) ---- */
+function renderSupport(){const el=$("supc");if(!el)return;
+ const go=(t,b)=>{el.innerHTML=`<h2>Your support person</h2><p class="note">${t}</p><button class="sec" id="gD" style="margin:0">${b}</button>`;$("gD").onclick=()=>show("D")};
+ if(!meta())return go("Save a relative or friend in your private locker to alert them in one tap.","Set up my locker");
+ if(!KEY)return go("Unlock your locker to see your support contact.","Unlock");
+ if(!V.contacts.length)return go("No support contact saved yet.","Add a contact");
+ el.innerHTML='<h2>Your support person</h2>'+V.contacts.map((c,i)=>`<div class="it"><b>${esc(c.n)}</b> <span class="tag">${esc(c.r||"contact")}</span><div class="row" style="margin-top:6px"><a class="c" href="tel:${esc(c.p.replace(/\s/g,""))}">Call</a><button data-m="${i}">Message</button></div></div>`).join("")+'<label class="note"><input type="checkbox" id="loc"> Include my location link</label><p class="note">The message shares only your urgency colour, never your symptoms.</p>';
+ el.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>msgContact(V.contacts[+b.dataset.m]))}
+function msgContact(c){let t=`HealthSetu: ${V.profile.name||"I"} used a symptom check${LAST?" (urgency: "+LAST.lvl+")":""} and may need help. Please call.`;const go=()=>{location.href="sms:"+c.p.replace(/\s/g,"")+"?&body="+encodeURIComponent(t)};
+ if($("loc")&&$("loc").checked&&navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{t+=` Location: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;go()},()=>go(),{timeout:8000});else go()}
+$("savechk").onclick=async()=>{if(!LAST)return;if(!meta()){show("D");say("Create your locker first, then save the check.");return}if(!KEY){show("D");say("Unlock your locker, then save the check.");return}
+ V.records.unshift({id:Date.now(),ts:LAST.ts,type:"Triage check",lvl:LAST.lvl,sc:LAST.sc,text:(LAST.regions.join(", ")||"No body area")+". "+LAST.txt.trim().slice(0,300)+(LAST.why.length?" Reasons: "+LAST.why.join("; "):"")});
+ say(await save()?"Saved to your private records.":"Could not save.")};
+
+/* ---- Specialist screen ---- */
+const SPEC=["General Medicine","Cardiology","Neurology","Orthopaedics","Obstetrics & Gynaecology","Paediatrics","Dermatology","ENT","Ophthalmology","Mental health"];
+const SQ={"General Medicine":"general physician","Cardiology":"cardiologist","Neurology":"neurologist","Orthopaedics":"orthopaedic doctor","Obstetrics & Gynaecology":"gynaecologist","Paediatrics":"paediatrician","Dermatology":"dermatologist","ENT":"ENT doctor","Ophthalmology":"eye hospital","Mental health":"psychiatrist"};
+let spec=null;
+function suggest(){const F=new Set(LAST.flags),g=new Set(LAST.grps),o=[],add=x=>{if(!o.includes(x))o.push(x)};
+ if(F.has("chest_pain")||F.has("breathless"))add("Cardiology");if(F.has("head_numb")||F.has("weak_one_side")||F.has("numb"))add("Neurology");if(F.has("pregnant"))add("Obstetrics & Gynaecology");if(F.has("infant"))add("Paediatrics");
+ if(F.has("rash"))add("Dermatology");if(g.has("eye"))add("Ophthalmology");if(g.has("ear")||g.has("mouth"))add("ENT");if(F.has("injury")||g.has("joint")||g.has("limb")||F.has("back_pain"))add("Orthopaedics");add("General Medicine");return o}
+function summary(inc){const L=["Health summary from HealthSetu AI (decision support only, not a diagnosis)"];if(spec)L.push("Specialty requested: "+spec);
+ if(inc&&V){const p=V.profile;[["Name",p.name],["Age",p.age],["Blood group",p.bg],["Allergies",p.allergy],["Conditions",p.cond],["Medicines",p.meds]].forEach(([k,v])=>v&&L.push(k+": "+v))}
+ if(LAST){L.push("Date: "+new Date(LAST.ts).toLocaleString(),"Urgency: "+LAST.lvl+" ("+LAST.sc+"/100)");if(LAST.regions.length)L.push("Areas: "+LAST.regions.join(", "));if(LAST.txt.trim())L.push("Patient words: "+LAST.txt.trim());if(LAST.why.length)L.push("Triage reasons: "+LAST.why.join("; "))}else L.push("No symptom check done in this session.");return L.join("\n")}
+function renderC(){const el=$("C"),sg=LAST?suggest():[];if(!spec)spec=sg[0]||null;
+ el.innerHTML=`<div class="card"><h2>Contact a specialist</h2><p class="note">${LAST?"Suggested from your last check (★). You can pick any.":"Pick a specialty."}</p><div class="row" id="specs"></div></div>
+<div class="card"><h2>1. Free tele-consult</h2><p class="note">eSanjeevani is the government's free video consultation service. Check the portal for specialist OPD timings.</p><a class="go" style="display:block;text-align:center;text-decoration:none" href="https://esanjeevani.mohfw.gov.in" target="_blank" rel="noopener">Open eSanjeevani</a><p class="note">Mental health support: Tele-MANAS <a class="lnk" href="tel:14416">14416</a>. Health advice: <a class="lnk" href="tel:104">104</a>.</p></div>
+<div class="card"><h2>2. Specialists near me</h2><div id="spl" class="note">Pick a specialty, then search.</div><button class="sec" id="spfind" style="margin-top:8px">Find near me</button></div>
+<div class="card"><h2>3. Share a summary</h2><label class="note"><input type="checkbox" id="incp" ${KEY?"":"disabled"}> Include my locker profile${KEY?"":" (unlock Records first)"}</label><textarea id="sum" style="min-height:130px;margin-top:6px"></textarea><div class="row"><button id="cp">Copy</button><button id="shr">Share…</button></div><p class="note">You can edit this text. Nothing leaves your phone until you copy or share it.</p></div>`;
+ [...sg,...SPEC.filter(x=>!sg.includes(x))].forEach(x=>{const b=document.createElement("button");b.textContent=x+(sg.includes(x)?" ★":"");b.setAttribute("aria-pressed",x==spec);b.onclick=()=>{spec=x;renderC()};$("specs").appendChild(b)});
+ const upd=()=>{$("sum").value=summary($("incp").checked)};$("incp").onchange=upd;upd();
+ $("cp").onclick=async()=>{try{await navigator.clipboard.writeText($("sum").value);$("cp").textContent="Copied"}catch{$("sum").select()}};
+ if(navigator.share)$("shr").onclick=()=>navigator.share({title:"Health summary",text:$("sum").value}).catch(()=>{});else $("shr").classList.add("hide");
+ $("spfind").onclick=findSpec}
+function findSpec(){const el=$("spl");if(!spec){el.textContent="Pick a specialty first.";return}
+ if(!navigator.geolocation){el.textContent="Location is not available. Call 104 for help finding a specialist.";return}
+ el.textContent="Searching…";
+ navigator.geolocation.getCurrentPosition(p=>{const a=p.coords.latitude,b=p.coords.longitude;
+  const run=async()=>{if(!mbt()){needTok(el,run);return}el.textContent="Searching…";
+   try{const [A,B]=await Promise.all([mbSearch(SQ[spec],a,b),mbSearch("hospital",a,b)]),seen=new Set();
+    const L=[...A.map(x=>({...x,m:1})),...B.map(x=>({...x,m:0}))].filter(x=>x.n&&!seen.has(x.n)&&seen.add(x.n)).sort((x,y)=>(y.m-x.m)||(x.d-y.d)).slice(0,8);
+    el.innerHTML=L.length?L.map(x=>item(x,x.m?`<span class="tag">${esc(spec)}</span>`:`<span class="tag">hospital: ask for ${esc(spec)} OPD</span>`)).join("")+'<button class="sec" id="mbtnS" style="margin-top:8px">Show on map</button><div id="mapS"></div><p class="note">Place data © Mapbox and its suppliers. Listings may be incomplete or outdated. Call ahead to confirm a specialist is available.</p>':"No listings found. Call 104 for help.";
+    if($("mbtnS"))$("mbtnS").onclick=()=>drawMB("mapS",L,{la:a,lo:b})}
+   catch(e){el.textContent="Could not load listings ("+(e&&e.message=="401"?"check your Mapbox token":"offline or service busy")+"). Call 104 for help."}};
+  run()},()=>{el.textContent="Location permission denied. Call 104 for help finding a specialist."},{timeout:10000})}
+</script>
+</body>
+</html>
